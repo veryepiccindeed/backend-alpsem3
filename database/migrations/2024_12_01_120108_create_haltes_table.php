@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('haltes', function (Blueprint $table) {
             $table->id();
+            $table->string('nama_halte');
+            $table->string('koordinat');
             $table->timestamps();
         });
     }

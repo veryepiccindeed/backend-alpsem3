@@ -11,10 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('trayek_haltes')) {
         Schema::create('trayek_haltes', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('id_trayek');
+            $table->unsignedBigInteger('id_halte');
+            $table->integer('urutan_halte_dalam_trayek');
+            $table->integer('jarak_ke_halte_berikutnya');
+            $table->string('estimasi_waktu')->nullable();
             $table->timestamps();
+
+            $table->foreign('id_trayek')->references('id')->on('trayeks')->onDelete('cascade');
+            $table->foreign('id_halte')->references('id')->on('haltes')->onDelete('cascade');
         });
+        }
     }
 
     /**

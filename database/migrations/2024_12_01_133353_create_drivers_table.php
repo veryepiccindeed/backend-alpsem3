@@ -11,10 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('drivers')) {
         Schema::create('drivers', function (Blueprint $table) {
-            $table->id();
+            $table->id('id_driver')->constrained('users');
+            $table->unsignedBigInteger('id_kendaraan');
+            $table->integer('no_sim');
+            $table->date('masa_berlaku_sim');
             $table->timestamps();
+
+            $table->foreign('id_kendaraan')->references('id')->on('kendaraans')->onDelete('cascade');
         });
+        }
     }
 
     /**
