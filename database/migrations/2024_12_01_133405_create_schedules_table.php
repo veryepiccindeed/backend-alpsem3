@@ -11,10 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('trayeks', function (Blueprint $table) {
+        if (!Schema::hasTable('schedules')) {
+        Schema::create('schedules', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('id_kendaraan');
+            $table->timestamp('waktu_berangkat');
+            $table->timestamp('waktu_tiba');
             $table->timestamps();
+
+            $table->foreign('id_kendaraan')->references('id')->on('kendaraans')->onDelete('cascade');
         });
+        }
     }
 
     /**
@@ -22,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('trayeks');
+        Schema::dropIfExists('schedules');
     }
 };

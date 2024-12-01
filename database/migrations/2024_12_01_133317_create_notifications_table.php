@@ -11,10 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('notifications')) {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
+            $table->string('judul');
+            $table->string('pesan'); 
+            $table->enum('jenis', ['info', 'promo', 'akun']); 
+            $table->unsignedBigInteger('id_driver')->nullable(); 
+            $table->unsignedBigInteger('id_user')->nullable(); 
             $table->timestamps();
+    
+            $table->foreign('id_user')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('id_driver')->references('id_driver')->on('drivers')->onDelete('cascade');
         });
+        }
     }
 
     /**

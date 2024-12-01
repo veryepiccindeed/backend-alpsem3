@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('kendaraans', function (Blueprint $table) {
             $table->id();
+            $table->string('no_plat')->unique();
+            $table->integer('tahun_kendaraan');
+            $table->boolean('is_tersedia')->default(true);
+            $table->string('koordinat');
             $table->timestamps();
         });
     }

@@ -11,10 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transactions', function (Blueprint $table) {
+        if (!Schema::hasTable('trayeks')) {
+        Schema::create('trayeks', function (Blueprint $table) {
             $table->id();
+            $table->string('kode_trayek');
+            $table->integer('total_jarak');
+            $table->unsignedBigInteger('id_schedule');
             $table->timestamps();
+
+            $table->foreign('id_schedule')->references('id')->on('schedules')->onDelete('cascade');
         });
+        }
     }
 
     /**
@@ -22,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transactions');
+        Schema::dropIfExists('trayeks');
     }
 };
