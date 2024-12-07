@@ -21,6 +21,14 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'no_hp',
+        'alamat',
+        'gender',
+        'tgl_lahir',
+        'role',
+        'foto_profil'
+
+
     ];
 
     /**
@@ -42,4 +50,19 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'id_user');
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'id_user');
+    }
+
+    public function driver()
+    {
+        return $this->hasOne(Driver::class, 'id_driver');
+    }
 }
