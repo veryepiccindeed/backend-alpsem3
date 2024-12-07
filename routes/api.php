@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HalteController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\LoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,3 +22,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/haltes', [HalteController::class, 'index']);
+
+// Register
+Route::post('/register', [RegisterController::class, 'register']);
+
+// Login & Logout
+Route::middleware(['web'])->post('/login', [LoginController::class, 'login']);
+Route::middleware(['web'])->post('/logout', [LoginController::class, 'logout']);
+
+

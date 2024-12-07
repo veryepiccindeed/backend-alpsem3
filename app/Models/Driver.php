@@ -17,6 +17,9 @@ class Driver extends Model
         'id_kendaraan',
         'no_sim',
         'masa_berlaku_sim',
+        'foto_sim',
+        'foto_ktp',
+        'foto_profil',
     ];
 
     public function user()

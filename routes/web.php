@@ -16,3 +16,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Testing Middleware
+Route::middleware('auth:web')->get('/profile', function (Request $request) {
+    return response()->json(['message' => 'You are authenticated', 'user' => $request->user()]);
+});
+
