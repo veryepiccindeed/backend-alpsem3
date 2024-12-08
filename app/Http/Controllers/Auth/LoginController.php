@@ -11,39 +11,32 @@ use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
-    public function login(Request $request)
-    {
-        $validated = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-            'role' => 'required|in:customer,driver',
-        ]);
-
-        $user = User::where('email', $validated['email'])->first();
-
-        if (!$user || $user->role !== $validated['role']) {
-            throw ValidationException::withMessages([
-                'email' => ['Email atau role tidak cocok.'],
+        public function login(Request $request)
+        {
+            // Validasi input
+            $validated = $request->validate([
+                'email' => 'required|email',
+                'password' => 'required|string',
+                'role' => 'required|in:customer,driver', // Pastikan role dikirimkan
+            ]);
+    
+            // Cari user berdasarkan email
+            $user = User::where('email', $validated['email'])->first();
+    
+            // Validasi password dan role
+            if (!$user || !Hash::check($validated['password'], $user->password) || $user->role !== $validated['role']) {
+                throw ValidationException::withMessages([
+                    'email' => ['Email, password, atau role tidak sesuai.'],
+                ]);
+            }
+    
+            // Login dan buat token
+            $token = $user->createToken('MyApp')->plainTextToken;
+    
+            return response()->json([
+                'message' => 'Login successful',
+                'role' => $user->role,
+                'token' => $token,
             ]);
         }
-
-        if (!Hash::check($validated['password'], $user->password)) {
-            throw ValidationException::withMessages([
-                'password' => ['Password salah.'],
-            ]);
-        }
-
-        Auth::login($user);  // Melakukan login menggunakan session (auth:web)
-
-        return response()->json(['message' => 'Login successful']);
-    }
-
-    public function logout(Request $request)
-    {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return response()->json(['message' => 'Logged out successfully']);
-    }
 }
