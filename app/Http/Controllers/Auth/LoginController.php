@@ -25,9 +25,10 @@ class LoginController extends Controller
     
             // Validasi password dan role
             if (!$user || !Hash::check($validated['password'], $user->password) || $user->role !== $validated['role']) {
-                throw ValidationException::withMessages([
-                    'email' => ['Email, password, atau role tidak sesuai.'],
-                ]);
+                // Jika login gagal, return response JSON
+                return response()->json([
+                    'message' => 'Email, password, atau role tidak sesuai.',
+                ], 401); // Status 401 Unauthorized
             }
     
             // Login dan buat token
