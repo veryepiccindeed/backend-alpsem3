@@ -92,6 +92,9 @@ class DatabaseSeeder extends Seeder
             'id_kendaraan' => 1, // Ensure this ID exists in kendaraans
             'no_sim' => 123456789,
             'masa_berlaku_sim' => '2025-01-01',
+            'foto_profil' => null,
+            'foto_ktp' => null,
+            'foto_sim' => null,
         ]);
 
         // Notifications
