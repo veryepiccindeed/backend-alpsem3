@@ -27,12 +27,6 @@ class RegisterController extends Controller
             'tgl_lahir' => 'required|date',
             'role' => 'required|in:customer,driver',
             'foto_profil' => 'nullable|file|mimes:jpg,png|max:2048',
-            // Atribut driver (opsional jika role=driver)
-            'id_kendaraan' => 'required_if:role,driver|exists:kendaraans,id',
-            'foto_sim' => 'nullable|file|mimes:jpg,png|max:2048',
-            'no_sim' => 'required_if:role,driver|numeric',
-            'masa_berlaku_sim' => 'required_if:role,driver|date',
-            'foto_ktp' => 'nullable|file|mimes:jpg,png|max:2048',
         ]);
 
         if ($validated->fails()) {
@@ -57,33 +51,6 @@ class RegisterController extends Controller
             $fotoProfilBinary = file_get_contents($file->getRealPath());  // Mengubah file menjadi data BLOB
             $user->foto_profil = $fotoProfilBinary;
             $user->save();
-        }
-
-        // Jika role = driver, buat entri di tabel drivers
-        if ($request->role === 'driver') {
-            $driver = Driver::create([
-                'id_user' => $user->id,
-                'id_kendaraan' => $request->id_kendaraan,
-            ]);
-
-            // Simpan foto SIM sebagai BLOB jika ada
-            if ($request->hasFile('foto_sim')) {
-                $file = $request->file('foto_sim');
-                $fotoSimBinary = file_get_contents($file->getRealPath());
-                $driver->foto_sim = $fotoSimBinary;
-            }
-
-            // Simpan foto KTP sebagai BLOB jika ada
-            if ($request->hasFile('foto_ktp')) {
-                $file = $request->file('foto_ktp');
-                $fotoKtpBinary = file_get_contents($file->getRealPath());
-                $driver->foto_ktp = $fotoKtpBinary;
-            }
-
-            // Menyimpan data terkait SIM
-            $driver->no_sim = $request->no_sim;
-            $driver->masa_berlaku_sim = $request->masa_berlaku_sim;
-            $driver->save();
         }
 
         return response()->json(['message' => 'Registration successful', 'user' => $user], 201);
