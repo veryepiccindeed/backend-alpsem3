@@ -19,11 +19,6 @@ use App\Http\Controllers\PemesananController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-Route::get('/haltes', [HalteController::class, 'index']);
 
 // Register
 Route::post('/register', [RegisterController::class, 'register']);
@@ -31,14 +26,16 @@ Route::post('/register', [RegisterController::class, 'register']);
 
 // Login & Logout 
 Route::post('/login', [LoginController::class, 'login']);
-Route::middleware('auth:sanctum')->post('/logout', [ApiController::class, 'logout']);
 
-// Tes Profile Yang Ter-login
-Route::middleware('auth:sanctum')->get('/profile', [ApiController::class, 'getProfile']);
 
+// Middleware 
 Route::middleware('auth:sanctum')->group(function () {
     // Route untuk pemesanan tiket, memerlukan autentikasi
     Route::post('/pemesanan', [PemesananController::class, 'pemesananTiket']);
+    // Logout
+    Route::post('/logout', [ApiController::class, 'logout']);
+    // Tes Profile Yang Ter-login
+    Route::get('/profile', [ApiController::class, 'getProfile']);
 });
 
 // Yang bisa dilihat tanpa autentikasi
@@ -46,5 +43,7 @@ Route::get('/trayeks', [PemesananController::class, 'getTrayeks']);
 Route::get('/haltes', [PemesananController::class, 'getHaltes']);
 Route::get('/schedules', [PemesananController::class, 'getSchedules']);
 Route::get('/trayek-haltes', [PemesananController::class, 'getTrayekHaltes']);
+
+
 
 
