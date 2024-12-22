@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../network/api.dart'; // Pastikan path sesuai dengan file API Anda
+import '../network/api.dart'; // Sesuaikan dengan lokasi file API Anda
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -25,13 +25,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController addressController = TextEditingController();
   final TextEditingController genderController = TextEditingController();
   final TextEditingController birthDateController = TextEditingController();
-  final TextEditingController roleController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    roleController.text = 'user'; // Default role
-  }
 
   // Fungsi untuk mengubah visibility password
   void showHide() {
@@ -63,7 +56,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       'alamat': addressController.text,
       'gender': genderController.text,
       'tgl_lahir': birthDateController.text,
-      'role': roleController.text, // Tambahkan role di sini
     };
 
     var res = await Network().auth(data, '/register');
@@ -180,16 +172,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Tanggal lahir tidak boleh kosong';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: roleController,
-                decoration: const InputDecoration(hintText: 'Role'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Role tidak boleh kosong';
                   }
                   return null;
                 },

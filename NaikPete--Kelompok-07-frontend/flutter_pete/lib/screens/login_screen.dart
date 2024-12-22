@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pete/screens/home_screen.dart';
 import '../widgets/custom_textfield.dart'; // Sesuaikan path ini
 import 'package:flutter_pete/network/api.dart'; // Sesuaikan path ini
-import 'package:flutter_pete/screens/register_screen.dart'; // Sesuaikan path ini
+import 'package:flutter_pete/screens/register_screen.dart'; // Tambahkan ini
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
@@ -55,20 +55,19 @@ class _AuthScreenState extends State<AuthScreen> {
       print('Sending login request with data: $data');
       final response = await Network().auth(data, '/login'); // Panggil API login
       final body = json.decode(response.body);
-      print('Response status: ${response.statusCode}');
       print('Response body: $body');
 
-      if (body.containsKey('success') && body['success'] == true) {
+      if (body['success'] == true) {
         final SharedPreferences localStorage = await SharedPreferences.getInstance();
-        localStorage.setString('token', json.encode(body['token'] ?? ''));
-        localStorage.setString('user', json.encode(body['user'] ?? {}));
-        localStorage.setString('role', body['user']['role'] ?? '');
+        localStorage.setString('token', json.encode(body['token']));
+        localStorage.setString('user', json.encode(body['user']));
+        localStorage.setString('role', body['user']['role']); // Simpan peran ke localStorage
 
-        print('Token saved: ${localStorage.getString('token')}');
-        print('User saved: ${localStorage.getString('user')}');
+        print('Token: ${localStorage.getString('token')}');
+        print('User: ${localStorage.getString('user')}');
+        print('Navigating to HomeScreen...');
 
         if (mounted) {
-          print('Navigating to HomeScreen...');
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -77,8 +76,8 @@ class _AuthScreenState extends State<AuthScreen> {
           );
         }
       } else {
-        showSnackBar(body['message'] ?? 'Login failed.');
-        print('Login failed: ${body['message'] ?? 'Unknown error'}');
+        showSnackBar(body['message']);
+        print('Login failed: ${body['message']}');
       }
     } catch (e) {
       showSnackBar('Terjadi kesalahan. Silakan coba lagi.');
@@ -200,4 +199,4 @@ class _AuthScreenState extends State<AuthScreen> {
       ),
     );
   }
-}
+} 
