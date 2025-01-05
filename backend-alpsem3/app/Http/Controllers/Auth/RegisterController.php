@@ -9,10 +9,9 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\Driver;
 
-
 class RegisterController extends Controller
 {
-     /**
+    /**
      * Handle user registration.
      */
     public function register(Request $request)
@@ -26,21 +25,22 @@ class RegisterController extends Controller
             'alamat' => 'required|string',
             'gender' => 'required|in:laki-laki,perempuan',
             'tgl_lahir' => 'required|date',
-            'role' => 'required|in:customer,driver',  // Pastikan role dikirimkan dan valid
-            'foto_profil' => 'nullable|file|mimes:jpg,png|max:2048',
+            'role' => 'required|in:customer,driver', // Menentukan role yang valid
+            'foto_profil' => 'nullable|file|mimes:jpg,png|max:2048', // Validasi untuk foto profil
         ]);
 
+        // Jika validasi gagal
         if ($validated->fails()) {
             return response()->json(['errors' => $validated->errors()], 422);
         }
 
         // Jika role adalah customer
         if ($request->role == 'customer') {
-            // Buat user
+            // Buat user untuk customer
             $user = User::create([
                 'nama' => $request->nama,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'password' => Hash::make($request->password), // Encrypt password
                 'no_hp' => $request->no_hp,
                 'alamat' => $request->alamat,
                 'gender' => $request->gender,
@@ -51,7 +51,7 @@ class RegisterController extends Controller
             if ($request->hasFile('foto_profil')) {
                 $file = $request->file('foto_profil');
                 $fotoProfilBinary = file_get_contents($file->getRealPath());  // Mengubah file menjadi data BLOB
-                $user->foto_profil = $fotoProfilBinary;
+                $user->foto_profil = $fotoProfilBinary;  // Simpan dalam kolom foto_profil
                 $user->save();
             }
 
@@ -60,7 +60,7 @@ class RegisterController extends Controller
 
         // Jika role adalah driver
         if ($request->role == 'driver') {
-            // Validasi tambahan untuk driver (misalnya, jika driver perlu melampirkan dokumen lainnya nanti)
+            // Buat driver
             $driver = Driver::create([
                 'nama' => $request->nama,
                 'email' => $request->email,
@@ -69,13 +69,12 @@ class RegisterController extends Controller
                 'alamat' => $request->alamat,
                 'gender' => $request->gender,
                 'tgl_lahir' => $request->tgl_lahir,
-                // Kolom lainnya untuk driver seperti foto SIM dan KTP bisa ditambahkan nanti oleh admin
             ]);
 
             return response()->json(['message' => 'Driver registration successful', 'driver' => $driver], 201);
         }
 
+        // Jika role tidak valid
         return response()->json(['message' => 'Role not valid'], 400);
     }
-
 }

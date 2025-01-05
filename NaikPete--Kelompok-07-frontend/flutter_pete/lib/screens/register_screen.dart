@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../network/api.dart'; // Sesuaikan dengan lokasi file API Anda
+import 'package:flutter_pete/network/api.dart'; 
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
