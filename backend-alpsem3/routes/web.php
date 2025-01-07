@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -19,3 +20,6 @@ Route::middleware('auth:web')->get('/profile', function (Request $request) {
     return response()->json(['message' => 'You are authenticated', 'user' => $request->user()]);
 });
 
+Route::get("send-event", function(){
+    broadcast(new \App\Events\HelloEvent());
+});

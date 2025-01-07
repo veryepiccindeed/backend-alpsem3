@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ApiController;
 use App\Http\Controllers\PemesananController;
 
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -44,6 +45,6 @@ Route::get('/haltes', [PemesananController::class, 'getHaltes']);
 Route::get('/schedules', [PemesananController::class, 'getSchedules']);
 Route::get('/trayek-haltes', [PemesananController::class, 'getTrayekHaltes']);
 
-
-
-
+Route::get("send-event", function(){
+    broadcast(new \App\Events\HelloEvent());
+});
