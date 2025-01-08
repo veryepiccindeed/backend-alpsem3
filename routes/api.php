@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ApiController;
 use App\Http\Controllers\PemesananController;
+use App\Http\Controllers\GeocodingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +44,13 @@ Route::get('/trayeks', [PemesananController::class, 'getTrayeks']);
 Route::get('/haltes', [PemesananController::class, 'getHaltes']);
 Route::get('/schedules', [PemesananController::class, 'getSchedules']);
 Route::get('/trayek-haltes', [PemesananController::class, 'getTrayekHaltes']);
+
+// Menghitung jarak langsung
+Route::post('/hitung-jarak-langsung', [PemesananController::class, 'hitungJarakLangsung']);
+
+Route::get('/geocode', [GeocodingController::class, 'searchLocation']);
+Route::get('/reverse-geocode', [GeocodingController::class, 'reverseGeocode']);
+
 
 
 
