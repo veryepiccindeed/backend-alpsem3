@@ -12,9 +12,12 @@ class Transaction extends Model
     protected $fillable = [
         'id_user',
         'id_driver',
+        'jenis_tiket',
+        'tgl_transaksi',
+        'jumlah_penumpang',
+        'payment_method',
         'payment_amount',
         'payment_status',
-        'jumlah_tiket',
     ];
 
     public function user()

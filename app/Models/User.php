@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Database\Eloquent\Model;
 
 class User extends Authenticatable
 {
@@ -26,7 +25,6 @@ class User extends Authenticatable
         'alamat',
         'gender',
         'tgl_lahir',
-        'role',
         'foto_profil'
     ];
 
@@ -60,4 +58,13 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class, 'id_user');
     }
 
+    public function driver()
+    {
+        return $this->hasOne(Driver::class, 'id_driver');
+    }
+
+    public function kursis()
+    {
+        return $this->hasMany(Kursi::class, 'id_pemesan');
+    }
 }

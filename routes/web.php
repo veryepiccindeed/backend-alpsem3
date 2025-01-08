@@ -14,8 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-// Testing Middleware
-Route::middleware('auth:web')->get('/profile', function (Request $request) {
-    return response()->json(['message' => 'You are authenticated', 'user' => $request->user()]);
-});
 
+Route::get('/map', function () {
+    return view('map');  
+});
