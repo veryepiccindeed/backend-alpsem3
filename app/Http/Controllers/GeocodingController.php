@@ -48,4 +48,29 @@ class GeocodingController extends Controller
 
         return response()->json(['error' => 'Failed to fetch address'], 500);
     }
+
+        public function getRoute(Request $request)
+    {
+            $startLat = $request->query('start_lat');
+            $startLon = $request->query('start_lon');
+            $endLat = $request->query('end_lat');
+            $endLon = $request->query('end_lon');
+
+            // Validasi input
+            if (!$startLat || !$startLon || !$endLat || !$endLon) {
+                return response()->json(['error' => 'Missing required parameters'], 400);
+            }
+
+            // OSRM Routing API URL
+            $osrmUrl = "http://localhost:5000/route/v1/driving/{$startLon},{$startLat};{$endLon},{$endLat}?overview=full&geometries=polyline";
+
+            // Fetch data dari OSRM
+            $response = Http::get($osrmUrl);
+
+            if ($response->ok()) {
+                return response()->json($response->json());
+            }
+
+            return response()->json(['error' => 'Failed to fetch route from OSRM'], 500);
+    }
 }

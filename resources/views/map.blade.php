@@ -4,85 +4,116 @@
     <title>Leaflet Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mapbox-polyline/1.2.1/polyline.min.js"></script>
+
     <style>
         #map {
             height: 500px;
             width: 100%;
         }
+        #suggestions-start, #suggestions-end {
+            list-style: none;
+            padding: 0;
+        }
+        #suggestions-start li, #suggestions-end li {
+            cursor: pointer;
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
     <h1>Leaflet with Nominatim</h1>
+        <div>
+            <input type="text" id="start-location" placeholder="Start location" autocomplete="off" />
+            <ul id="suggestions-start"></ul>
+            <input type="text" id="end-location" placeholder="End location" autocomplete="off" />
+            <ul id="suggestions-end"></ul>
+            <button onclick="getRoute()">Get Route</button>
+        </div>
         <div id="map"></div>
-        <input type="text" id="search" placeholder="Enter location" autocomplete="off" />
-        <ul id="suggestions"></ul>
-        <button onclick="searchLocation()">Search</button>
-
+        
         <script>
-            // Initialize the map
-            var map = L.map('map').setView([-6.2088, 106.8456], 13); // Jakarta
+        // Initialize the map
+        const map = L.map('map').setView([-5.132704287622194, 119.4091723088454], 13); 
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
 
-            // Add OpenStreetMap tile layer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-
-            const searchInput = document.getElementById('search');
-            const suggestionsList = document.getElementById('suggestions');
-
-            // Fetch and display suggestions
-            searchInput.addEventListener('input', function () {
-                const query = searchInput.value;
+        // Suggestions handling
+        function handleSuggestions(inputElement, suggestionsElement, isStart) {
+            inputElement.addEventListener('input', function () {
+                const query = inputElement.value;
                 if (!query) {
-                    suggestionsList.innerHTML = '';
+                    suggestionsElement.innerHTML = '';
                     return;
                 }
 
                 fetch(`/api/geocode?query=${query}`)
                     .then(response => response.json())
                     .then(data => {
-                        suggestionsList.innerHTML = '';
+                        suggestionsElement.innerHTML = '';
                         data.forEach(location => {
                             const li = document.createElement('li');
                             li.textContent = location.display_name;
                             li.dataset.lat = location.lat;
                             li.dataset.lon = location.lon;
                             li.addEventListener('click', () => {
-                                searchInput.value = location.display_name;
-                                suggestionsList.innerHTML = '';
-                                moveToLocation(location.lat, location.lon);
+                                inputElement.value = location.display_name;
+                                inputElement.dataset.lat = location.lat;
+                                inputElement.dataset.lon = location.lon;
+                                suggestionsElement.innerHTML = '';
                             });
-                            suggestionsList.appendChild(li);
+                            suggestionsElement.appendChild(li);
                         });
                     })
                     .catch(error => console.error('Error:', error));
             });
+        }
 
-            // Move to selected location
-            function moveToLocation(lat, lon) {
-                const marker = L.marker([lat, lon]).addTo(map);
-                map.setView([lat, lon], 15);
-                marker.bindPopup(`<b>${searchInput.value}</b>`).openPopup();
+        const startInput = document.getElementById('start-location');
+        const startSuggestions = document.getElementById('suggestions-start');
+        const endInput = document.getElementById('end-location');
+        const endSuggestions = document.getElementById('suggestions-end');
+
+        handleSuggestions(startInput, startSuggestions, true);
+        handleSuggestions(endInput, endSuggestions, false);
+
+        // Fetch and display route from OSRM
+        function getRoute() {
+            const startLat = startInput.dataset.lat;
+            const startLon = startInput.dataset.lon;
+            const endLat = endInput.dataset.lat;
+            const endLon = endInput.dataset.lon;
+
+            if (!startLat || !startLon || !endLat || !endLon) {
+                alert('Please select both start and end locations.');
+                return;
             }
 
-            // Function to search location
-            function searchLocation() {
-                const query = searchInput.value;
-                if (!query) return alert('Please enter a location');
-                
-                fetch(`/api/geocode?query=${query}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.length > 0) {
-                            const { lat, lon } = data[0]; // Ambil hasil pertama
-                            moveToLocation(lat, lon);
-                        } else {
-                            alert('Location not found');
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
-            }
+
+            const osrmUrl = `/api/get-route?start_lat=${startLat}&start_lon=${startLon}&end_lat=${endLat}&end_lon=${endLon}`;
+                 fetch(osrmUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.routes && data.routes.length > 0) {
+                        const route = data.routes[0];
+
+                        // Decode polyline dari OSRM menggunakan mapbox-polyline
+                        const decodedCoordinates = polyline.decode(route.geometry);
+
+                        // Buat polyline Leaflet dari koordinat yang didekodekan
+                        const leafletPolyline = L.polyline(decodedCoordinates, { color: 'blue' }).addTo(map);
+
+                        // Zoom untuk menampilkan polyline sepenuhnya di peta
+                        map.fitBounds(leafletPolyline.getBounds());
+                    } else {
+                        alert('No route found');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+
+        }
         </script>
     </body>
     </html>
