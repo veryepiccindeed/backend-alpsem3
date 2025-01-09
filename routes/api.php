@@ -45,11 +45,11 @@ Route::get('/haltes', [PemesananController::class, 'getHaltes']);
 Route::get('/schedules', [PemesananController::class, 'getSchedules']);
 Route::get('/trayek-haltes', [PemesananController::class, 'getTrayekHaltes']);
 
-// Menghitung jarak langsung
-Route::post('/hitung-jarak-langsung', [PemesananController::class, 'hitungJarakLangsung']);
 
+// Geocoding & Reverse geocoding
 Route::get('/geocode', [GeocodingController::class, 'searchLocation']);
 Route::get('/reverse-geocode', [GeocodingController::class, 'reverseGeocode']);
+Route::get('/get-route', [GeocodingController::class, 'getRoute']);
 
 
 
