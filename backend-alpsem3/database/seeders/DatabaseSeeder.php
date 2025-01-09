@@ -53,15 +53,15 @@ class DatabaseSeeder extends Seeder
                 'tgl_lahir' => '1990-01-02',
                 'role' => 'driver',
                 'foto_profil' => null,
-            ]
-                        [
-                'nama' => 'John Doe 2',
-                'email' => 'john.doe2@example.com',
-                'password' => 'inipassword2', 
+            ],
+            [
+                'nama' => 'Tobiichi Origami',
+                'email' => 'Origami@gmail.com',
+                'password' => 'Origami2021', 
                 'no_hp' => '081234567899',
                 'alamat' => 'Jl. Contoh No. 2',
-                'gender' => 'laki-laki',
-                'tgl_lahir' => '1990-01-02',
+                'gender' => 'perempuan',
+                'tgl_lahir' => '2001-11-11',
                 'role' => 'driver',
                 'foto_profil' => null,
             ]

@@ -6,8 +6,33 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+
+
 class ApiController extends Controller
 {
+/**
+ * @OA\Get(
+ *     path="/api/user",
+ *     operationId="getUser",
+ *     tags={"User"},
+ *     summary="Get User Data",
+ *     @OA\Response(
+ *         response=200,
+ *         description="Success",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="id", type="integer"),
+ *             @OA\Property(property="name", type="string")
+ *         )
+ *     ),
+ * )
+ */
+public function getUser()
+{
+    return response()->json(auth()->user());
+}
+
+
+
     // Middleware akan memeriksa token menggunakan Sanctum
     public function __construct()
     {
