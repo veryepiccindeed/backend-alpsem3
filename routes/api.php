@@ -49,7 +49,12 @@ Route::get('/trayek-haltes', [PemesananController::class, 'getTrayekHaltes']);
 // Geocoding & Reverse geocoding
 Route::get('/geocode', [GeocodingController::class, 'searchLocation']);
 Route::get('/reverse-geocode', [GeocodingController::class, 'reverseGeocode']);
+
 Route::get('/get-route', [GeocodingController::class, 'getRoute']);
+Route::get('/koordinat-halte', [GeocodingController::class, 'getKoordinatHalte']);
+Route::get('/circular-route', [GeocodingController::class, 'getCircularRoute']);
+Route::get('/circular-route-reverse', [GeocodingController::class, 'getReverseRoute']);
+
 
 
 

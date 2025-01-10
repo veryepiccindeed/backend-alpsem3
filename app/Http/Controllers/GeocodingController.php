@@ -73,4 +73,45 @@ class GeocodingController extends Controller
 
             return response()->json(['error' => 'Failed to fetch route from OSRM'], 500);
     }
+
+        public function getKoordinatHalte()
+    {
+            // Inisialisasi data halte
+            $stops = [
+                ['name' => 'Kampus Unhas Teknik Gowa', 'lat' => -5.2299394697095245, 'lon' => 119.50211253693419],
+                ['name' => 'Halte CSA Unhas', 'lat' => -5.230279153107808, 'lon' => 119.50271553823227],
+                ['name' => 'Asrama Rindam Gowa', 'lat' => -5.225254, 'lon' => 119.496872],
+                ['name' => 'Citraland Hertasning', 'lat' => -5.18092218503825, 'lon' => 119.46426590725011],
+                ['name' => 'Mall Panakkukang', 'lat' => -5.156793513683525, 'lon' => 119.44766356706735],
+                ['name' => 'Taman Pakui', 'lat' => -5.151616686795926, 'lon' => 119.43729584824564],
+                ['name' => 'Halte GPIB Mangngamaseang', 'lat' => -5.145760125553669, 'lon' => 119.46944072857308],
+                ['name' => 'Fakultas Sospol Unhas', 'lat' => -5.131505037510745, 'lon' => 119.49023242996354], // Kembali ke awal 
+            ];
+    
+           
+            return response()->json($stops);
+    }
+
+        public function getCircularRoute(Request $request)
+    {
+        $waypoints = $request->query('waypoints'); // Waypoints dalam format lon,lat;lon,lat;...
+
+        if (!$waypoints) {
+            return response()->json(['error' => 'Missing required parameters'], 400);
+        }
+
+        // OSRM Routing API URL
+        $osrmUrl = "http://localhost:5000/route/v1/driving/{$waypoints}?overview=full&geometries=polyline";
+
+        // Fetch data dari OSRM
+        $response = Http::get($osrmUrl);
+
+        if ($response->ok()) {
+            return response()->json($response->json());
+        }
+
+        return response()->json(['error' => 'Failed to fetch route from OSRM'], 500);
+    }
+
+
 }

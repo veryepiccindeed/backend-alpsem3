@@ -29,7 +29,11 @@
             <input type="text" id="end-location" placeholder="End location" autocomplete="off" />
             <ul id="suggestions-end"></ul>
             <button onclick="getRoute()">Get Route</button>
+            <button onclick="generateCircularRoute()">Generate Route</button>
+            <button onclick="generateReverseRoute()">Generate Reverse Route</button>
         </div>
+
+       
         <div id="map"></div>
         
         <script>
@@ -114,6 +118,90 @@
                 .catch(error => console.error('Error:', error));
 
         }
+
+
+        // Function to generate route polyline
+        function generateCircularRoute() {
+            fetchHalteCoordinates().then(stops => {
+                const waypoints = stops.map(stop => `${stop.lon},${stop.lat}`).join(';');
+                const routeUrl = `/api/circular-route?waypoints=${waypoints}`;
+
+                fetch(routeUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.routes && data.routes.length > 0) {
+                            const route = data.routes[0];
+                            const decodedCoordinates = polyline.decode(route.geometry);
+                            const routeLine = L.polyline(decodedCoordinates.map(coord => [coord[0], coord[1]]), { color: 'blue' }).addTo(map);
+                            map.fitBounds(routeLine.getBounds());
+
+                            // Add markers for each stop
+                            stops.forEach(stop => {
+                                const markerIcon = L.icon({
+                                    iconUrl: '/images/busmarker.png', // Use custom marker image
+                                    iconSize: [25, 25],
+                                    iconAnchor: [12, 12], // Icon anchor
+                                    popupAnchor: [0, -12] // Popup position
+                                });
+
+                                L.marker([stop.lat, stop.lon], { icon: markerIcon })
+                                    .addTo(map)
+                                    .bindPopup(`<b>${stop.name}</b>`);
+                            });
+                        } else {
+                            alert('No route found');
+                        }
+                    })
+                    .catch(error => console.error('Error generating route:', error));
+            });
+        }
+
+         // Function to generate reverse route
+         function generateReverseRoute() {
+            fetchHalteCoordinates().then(stops => {
+                const reversedStops = stops.reverse();  // Reverse the order of stops
+                const waypoints = reversedStops.map(stop => `${stop.lon},${stop.lat}`).join(';');
+                const routeUrl = `/api/circular-route?waypoints=${waypoints}`;
+
+                fetch(routeUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.routes && data.routes.length > 0) {
+                            const route = data.routes[0];
+                            const decodedCoordinates = polyline.decode(route.geometry);
+                            const routeLine = L.polyline(decodedCoordinates.map(coord => [coord[0], coord[1]]), { color: 'red' }).addTo(map);  // Different color for reverse route
+                            map.fitBounds(routeLine.getBounds());
+
+                            // Add markers for each reversed stop
+                            reversedStops.forEach(stop => {
+                                const markerIcon = L.icon({
+                                    iconUrl: '/images/busmarker.png', // Use custom marker image
+                                    iconSize: [25, 25],
+                                    iconAnchor: [12, 12], // Icon anchor
+                                    popupAnchor: [0, -12] // Popup position
+                                });
+
+                                L.marker([stop.lat, stop.lon], { icon: markerIcon })
+                                    .addTo(map)
+                                    .bindPopup(`<b>${stop.name}</b>`);
+                            });
+                        } else {
+                            alert('No reverse route found');
+                        }
+                    })
+                    .catch(error => console.error('Error generating reverse route:', error));
+            });
+        }
+
+               // Function to fetch Halte Coordinates from API
+               function fetchHalteCoordinates() {
+                    return fetch('/api/koordinat-halte')
+                        .then(response => response.json())
+                        .catch(error => {
+                            console.error('Error fetching halte coordinates:', error);
+                        });
+                }
+
         </script>
     </body>
     </html>
