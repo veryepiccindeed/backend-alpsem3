@@ -90,5 +90,16 @@ class ApiController extends Controller
         }
     }
 
+        public function deleteUser(Request $request)
+    {
+        // Get the authenticated user
+        $user = $request->user();
+
+        // Delete the user
+        $user->delete();
+
+        // Return a response indicating the user has been deleted
+        return response()->json(['message' => 'User account deleted successfully.']);
+    }
 
 }

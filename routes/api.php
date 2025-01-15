@@ -39,6 +39,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [ApiController::class, 'getProfile']);
     // Edit Profile
     Route::put('/edit-profile', [ApiController::class, 'editProfile']);
+    // Delete account
+    Route::delete('/delete-account', [ApiController::class, 'deleteUser']);
 });
 
 // Yang bisa dilihat tanpa autentikasi
