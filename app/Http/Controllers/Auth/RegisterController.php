@@ -23,7 +23,7 @@ class RegisterController extends Controller
             'email' => 'required|email|unique:users,email|unique:drivers,email', // Email harus unik untuk customer dan driver
             'password' => 'required|string|min:8|confirmed',
             'no_hp' => 'required|string|max:15',
-            'alamat' => 'required|string',
+            'alamat' => 'required|string|max:255',
             'gender' => 'required|in:laki-laki,perempuan',
             'tgl_lahir' => 'required|date',
             'role' => 'required|in:customer,driver',  // Pastikan role dikirimkan dan valid
