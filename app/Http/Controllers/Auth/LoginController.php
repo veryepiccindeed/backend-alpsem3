@@ -28,7 +28,7 @@ class LoginController extends Controller
             // Validasi password untuk customer
             if (!$user || !Hash::check($validated['password'], $user->password)) {
                 return response()->json([
-                    'message' => 'Email atau password tidak sesuai.',
+                    'message' => 'Email, role, atau password tidak sesuai.',
                 ], 401); // Status 401 Unauthorized
             }
 
@@ -36,9 +36,10 @@ class LoginController extends Controller
             $token = $user->createToken('MyApp')->plainTextToken;
 
             return response()->json([
-                'message' => 'Login successful',
+                'message' => 'Login berhasil',
                 'role' => 'customer',
                 'token' => $token,
+                'nama' => $user->nama,
             ]);
         }
 
@@ -50,7 +51,7 @@ class LoginController extends Controller
             // Validasi password untuk driver
             if (!$driver || !Hash::check($validated['password'], $driver->password)) {
                 return response()->json([
-                    'message' => 'Email atau password tidak sesuai.',
+                    'message' => 'Email, role, atau password tidak sesuai.',
                 ], 401); // Status 401 Unauthorized
             }
 
@@ -58,9 +59,10 @@ class LoginController extends Controller
             $token = $driver->createToken('MyApp')->plainTextToken;
 
             return response()->json([
-                'message' => 'Login successful',
+                'message' => 'Login berhasil',
                 'role' => 'driver',
                 'token' => $token,
+                'nama' => $driver->nama,
             ]);
         }
 

@@ -55,7 +55,7 @@ class RegisterController extends Controller
                 $user->save();
             }
 
-            return response()->json(['message' => 'Customer registration successful', 'user' => $user], 201);
+            return response()->json(['message' => 'Registrasi customer berhasil', 'user' => $user], 201);
         }
 
         // Jika role adalah driver
@@ -72,10 +72,10 @@ class RegisterController extends Controller
                 // Kolom lainnya untuk driver seperti foto SIM dan KTP bisa ditambahkan nanti oleh admin
             ]);
 
-            return response()->json(['message' => 'Driver registration successful', 'driver' => $driver], 201);
+            return response()->json(['message' => 'Registrasi akun driver berhasil', 'driver' => $driver], 201);
         }
 
-        return response()->json(['message' => 'Role not valid'], 400);
+        return response()->json(['message' => 'Role tidak valid'], 400);
     }
 
 }

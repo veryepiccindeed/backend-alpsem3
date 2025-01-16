@@ -11,7 +11,7 @@ class Trayek extends Model
 
     protected $fillable = [
         'kode_trayek',
-        'total_jarak',
+        'urutan_halte',
         'id_schedule',
     ];
 
@@ -24,4 +24,11 @@ class Trayek extends Model
     {
         return $this->hasMany(TrayekHalte::class, 'id_trayek');
     }
+
+        // Pada model Trayek
+    public function haltes()
+    {
+        return $this->hasMany(Halte::class, 'kode_trayek', 'kode_trayek');
+    }
+
 }

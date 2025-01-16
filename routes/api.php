@@ -47,7 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/trayeks', [PemesananController::class, 'getTrayeks']);
 Route::get('/haltes', [PemesananController::class, 'getHaltes']);
 Route::get('/schedules', [PemesananController::class, 'getSchedules']);
-Route::get('/trayek-haltes', [PemesananController::class, 'getTrayekHaltes']);
+Route::get('/trayek/{trayekId}/haltes', [PemesananController::class, 'getTrayekWithHalte']);
 
 
 // Geocoding & Reverse geocoding

@@ -14,11 +14,14 @@ class Halte extends Model
 
     protected $fillable = [
         'nama_halte',
-        'koordinat',
+        'latitude',
+        'longitude',
     ];
 
     public function trayekHaltes()
     {
         return $this->hasMany(TrayekHalte::class, 'id_halte');
     }
+
+    
 }

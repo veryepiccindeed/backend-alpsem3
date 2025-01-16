@@ -42,6 +42,27 @@ class PemesananController extends Controller
         return response()->json($trayekHaltes);
     }
 
+    public function getTrayekWithHalte($trayekId)
+    {
+        // Ambil trayek berdasarkan ID dengan Eloquent
+        $trayek = Trayek::find($trayekId);
+    
+        if ($trayek) {
+            // Decode halte_order JSON
+            $halteIds = json_decode($trayek->urutan_halte);
+    
+            // Ambil detail halte berdasarkan ID menggunakan Eloquent
+            $haltes = Halte::whereIn('id', $halteIds)->get();
+    
+            return response()->json([
+                'kode_trayek' => $trayek->kode_trayek,
+                'urutan_halte' => $haltes
+            ]);
+        }
+    
+        return response()->json(['error' => 'Trayek tidak ditemukan'], 404);
+    }
+    
    
     public function pemesananTiket(Request $request)
     {
