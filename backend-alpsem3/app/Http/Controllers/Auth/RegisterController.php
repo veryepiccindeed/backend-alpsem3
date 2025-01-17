@@ -78,3 +78,4 @@ class RegisterController extends Controller
         return response()->json(['message' => 'Role not valid'], 400);
     }
 }
+
