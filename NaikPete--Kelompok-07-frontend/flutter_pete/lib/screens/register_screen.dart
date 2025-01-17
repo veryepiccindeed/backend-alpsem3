@@ -36,7 +36,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   // Fungsi untuk validasi input
   bool validateForm() {
   if (NameController.text.isEmpty) {
-    showError("Nama depan dan belakang wajib diisi");
+    showError("Nama wajib diisi");
     return false;
   }
   if (emailController.text.isEmpty || !emailController.text.contains('@')) {
@@ -123,64 +123,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       });
     }
   }
-
-  // Fungsi untuk mengirim data ke backend dan navigasi ke halaman login
-  void register() async {
-  if (!validateForm()) {
-    return; // Jika validasi gagal, jangan lanjut
-  }
-
-
-  // Prepare the data to be sent
-  Map<String, dynamic> requestData = {
-    "name": NameController, // Gunakan field name yang sudah digabungkan
-    "email": emailController.text,
-    "password": passwordController.text,
-    "password_confirmation": passwordController.text, // Tambahkan konfirmasi password
-    "no_hp": phoneController.text,
-    "alamat": cityController.text,
-    "gender": selectedGender, // Pastikan nilai ini sesuai dengan yang diharapkan server
-    "tgl_lahir": birthDateController.text,
-    "role": selectedRole, // Pastikan nilai ini sesuai dengan yang diharapkan server
-  };
-
-  // Tambahkan profile image (jika tersedia)
-  if (kIsWeb && webImage != null) {
-    requestData["profile_image"] = base64Encode(webImage!); // Encode gambar ke base64 untuk web
-  } else if (!kIsWeb && profileImage != null) {
-    requestData["profile_image"] = await http.MultipartFile.fromPath('profile_image', profileImage!.path); // Untuk mobile
-  }
-
-  // Log the request data
-  print("Request Data: $requestData");
-
-  // Kirim request ke server
-  try {
-    final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/api/register'),
-      body: jsonEncode(requestData),
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    if (response.statusCode == 200) {
-      // Sukses
-      print("Registration successful!");
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
-    } else {
-      // Handle error
-      print("Error: ${response.statusCode}");
-      print("Response: ${response.body}");
-      showError("Registration failed. Please try again.");
-    }
-  } catch (e) {
-    // Handle network errors
-    print("Error: $e");
-    showError("Network error. Please check your connection.");
-  }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -342,7 +284,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
               ),
-              onPressed: register,
+              onPressed: () {
+                
+              },
               child: const Text(
                 'Selanjutnya',
                 style: TextStyle(color: Colors.white),
