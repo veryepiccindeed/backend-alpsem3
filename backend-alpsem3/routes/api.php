@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Auth\NotificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HalteController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -27,6 +27,7 @@ Route::post('/register', [RegisterController::class, 'register']);
 
 // Login & Logout 
 Route::post('/login', [LoginController::class, 'login']);
+Route::get('/login', [LoginController::class, 'login']);
 
 
 // Middleware 
@@ -48,3 +49,9 @@ Route::get('/trayek-haltes', [PemesananController::class, 'getTrayekHaltes']);
 Route::get("send-event", function(){
     broadcast(new \App\Events\HelloEvent());
 });
+
+
+
+Route::get('notifications/{id}', [NotificationController::class, 'show']);
+use Illuminate\Support\Facades\Broadcast;
+

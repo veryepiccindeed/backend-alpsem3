@@ -5,107 +5,84 @@ namespace App\Http\Controllers\Auth;
 use App\Models\User;
 use App\Models\Driver;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
+    /**
+     * @OA\Post(
+     *     path="/api/login",
+     *     summary="Login for customer or driver",
+     *     tags={"Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/LoginRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Login successful",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Login successful"),
+     *             @OA\Property(property="role", type="string", example="customer"),
+     *             @OA\Property(property="token", type="string", example="JWT_TOKEN_HERE")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized - Invalid credentials",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Invalid email or password.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Unprocessable Entity - Validation errors",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Validation error."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+ * @OA\Schema(
+ *     schema="LoginRequest",
+ *     type="object",
+ *     required={"email", "password", "role"},
+ *     @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+ *     @OA\Property(property="password", type="string", format="password", example="password123"),
+ *     @OA\Property(property="role", type="string", enum={"customer", "driver"}, example="customer")
+ * )
+ */
+
     public function login(Request $request)
     {
         try {
-            // Validasi input
             $validated = $request->validate([
                 'email' => 'required|email',
                 'password' => 'required|string',
-                'role' => 'required|in:customer,driver', // Pastikan role valid
+                'role' => 'required|in:customer,driver',
             ]);
 
-            // Logging role dan email yang diterima
-            \Log::info('Login attempt', [
-                'email' => $validated['email'],
-                'role' => $validated['role']
-            ]);
+            $user = $validated['role'] === 'customer'
+                ? User::where('email', $validated['email'])->first()
+                : Driver::where('email', $validated['email'])->first();
 
-            // Jika role adalah customer
-            if ($validated['role'] === 'customer') {
-                // Cari user di tabel User
-                $user = User::where('email', $validated['email'])->first();
-
-                // Validasi password
-                if (!$user || !Hash::check($validated['password'], $user->password)) {
-                    \Log::warning('Customer login failed', [
-                        'email' => $validated['email']
-                    ]);
-
-                    return response()->json([
-                        'message' => 'Email atau password tidak sesuai.',
-                    ], 401); // Status 401 Unauthorized
-                }
-
-                // Generate token
-                $token = $user->createToken('MyApp')->plainTextToken;
-
-                return response()->json([
-                    'message' => 'Login successful',
-                    'role' => 'customer',
-                    'token' => $token,
-                ]);
+            if (!$user || !Hash::check($validated['password'], $user->password)) {
+                return response()->json(['message' => 'Invalid email or password.'], 401);
             }
 
-            // Jika role adalah driver
-            if ($validated['role'] === 'driver') {
-                // Cari driver di tabel Driver
-                $driver = Driver::where('email', $validated['email'])->first();
-
-                // Validasi password
-                if (!$driver || !Hash::check($validated['password'], $driver->password)) {
-                    \Log::warning('Driver login failed', [
-                        'email' => $validated['email']
-                    ]);
-
-                    return response()->json([
-                        'message' => 'Email atau password tidak sesuai.',
-                    ], 401); // Status 401 Unauthorized
-                }
-
-                // Generate token
-                $token = $driver->createToken('MyApp')->plainTextToken;
-
-                return response()->json([
-                    'message' => 'Login successful',
-                    'role' => 'driver',
-                    'token' => $token,
-                ]);
-            }
-
-            // Jika role tidak valid
-            \Log::error('Invalid role', [
-                'role' => $validated['role']
-            ]);
+            $token = $user->createToken('MyApp')->plainTextToken;
 
             return response()->json([
-                'message' => 'Role tidak valid.',
-            ], 400); // Status 400 Bad Request
+                'message' => 'Login successful',
+                'role' => $validated['role'],
+                'token' => $token,
+            ]);
         } catch (ValidationException $e) {
-            // Menangkap error validasi
-            \Log::error('Validation error', [
-                'errors' => $e->errors()
-            ]);
-
-            return response()->json([
-                'message' => $e->errors(),
-            ], 422); // Status 422 Unprocessable Entity
+            return response()->json(['message' => 'Validation error.', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            // Menangkap error lain
-            \Log::error('Login error', [
-                'message' => $e->getMessage()
-            ]);
-
-            return response()->json([
-                'message' => 'Terjadi kesalahan pada server.',
-            ], 500); // Status 500 Internal Server Error
+            return response()->json(['message' => 'Server error occurred.'], 500);
         }
     }
 }
