@@ -5,19 +5,24 @@ import 'package:flutter_pete/screens/profile_screen.dart';
 
 class FAQScreen extends StatelessWidget {
   final String username;
+  final String userToken;
 
-  const FAQScreen({Key? key, required this.username}) : super(key: key);
+  const FAQScreen({Key? key, required this.username, required this.userToken}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final List<Map<String, String>> faqList = [
       {
-        'question': 'Bagaimana cara melakukan pembayaran setelah memesan kursi?',
-        'answer': 'Setelah memilih kursi, Anda dapat melakukan pembayaran melalui metode yang tersedia di aplikasi, seperti e-wallet, transfer bank, atau pembayaran tunai.',
+        'question':
+            'Bagaimana cara melakukan pembayaran setelah memesan kursi?',
+        'answer':
+            'Setelah memilih kursi, Anda dapat melakukan pembayaran melalui metode yang tersedia di aplikasi, seperti e-wallet, transfer bank, atau pembayaran tunai.',
       },
       {
-        'question': 'Apa yang harus saya lakukan jika aplikasi mengalami error?',
-        'answer': 'Coba tutup dan buka kembali aplikasi. Jika masalah berlanjut, hubungi tim dukungan kami melalui menu bantuan.',
+        'question':
+            'Apa yang harus saya lakukan jika aplikasi mengalami error?',
+        'answer':
+            'Coba tutup dan buka kembali aplikasi. Jika masalah berlanjut, hubungi tim dukungan kami melalui menu bantuan.',
       },
       {
         'question': 'Apakah saya dapat memesan kursi untuk hari berikutnya?',
@@ -41,7 +46,8 @@ class FAQScreen extends StatelessWidget {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => HomeScreen(username: username),
+                builder: (context) =>
+                    HomeScreen(username: username, userToken: userToken),
               ),
             );
           },
@@ -125,30 +131,32 @@ class FAQScreen extends StatelessWidget {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => HomeScreen(username: username),
+                builder: (context) =>
+                    HomeScreen(username: username, userToken: userToken),
               ),
             );
           } else if (index == 1) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => HistoryScreen(username: username),
+                builder: (context) =>
+                    HistoryScreen(username: username, userToken: userToken),
               ),
             );
-          }else if (index == 2) {
+          } else if (index == 2) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => FAQScreen(username: username),
+                builder: (context) => FAQScreen(username: username, userToken: userToken),
               ),
             );
           } else if (index == 3) {
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) => ProfileScreen(username: username),
-            //   ),
-            // );
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileScreen(username: username, userToken: userToken),
+              ),
+            );
           }
         },
         items: const [

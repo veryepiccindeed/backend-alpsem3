@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pete/screens/Haltescreen.dart';
+import 'package:flutter_pete/screens/Halte_screen.dart';
 import 'package:flutter_pete/screens/History.dart';
 import 'package:flutter_pete/screens/faq_screen.dart';
 import 'package:flutter_pete/screens/profile_screen.dart';
-
-import 'schedule_screen.dart';
-
+import 'package:flutter_pete/screens/schedule_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final String username;
+  final String userToken; // Tambahkan parameter userToken
 
-  HomeScreen({required this.username}); // Menerima nama pengguna dari login
+  HomeScreen({required this.username, required this.userToken}); // Update konstruktor
 
   @override
   Widget build(BuildContext context) {
@@ -175,30 +174,33 @@ class HomeScreen extends StatelessWidget {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => HomeScreen(username: username),
+                builder: (context) => HomeScreen(
+                  username: username,
+                  userToken: userToken, // Teruskan userToken ke HomeScreen
+                ),
               ),
             );
           } else if (index == 1) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => HistoryScreen(username: username),
+                builder: (context) => HistoryScreen(username: username, userToken: userToken),
               ),
             );
-          }else if (index == 2) {
+          } else if (index == 2) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => FAQScreen(username: username),
+                builder: (context) => FAQScreen(username: username, userToken: userToken),
               ),
             );
           } else if (index == 3) {
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) => ProfileScreen(username: username),
-            //   ),
-            // );
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileScreen(username: username, userToken: userToken),
+              ),
+            );
           }
         },
         items: const [

@@ -47,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => HomeScreen(username: jsonDecode(user)['name']),
+          builder: (context) => HomeScreen(username: jsonDecode(user)['name'], userToken: token),
         ),
       );
     } else {

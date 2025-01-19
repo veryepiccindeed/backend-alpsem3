@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pete/screens/Drivescreen.dart';
+import 'package:flutter_pete/screens/Drive_screen.dart';
 import 'package:flutter_pete/screens/faq_screen.dart';
 import 'package:flutter_pete/screens/home_screen.dart';
 import 'package:flutter_pete/screens/profile_screen.dart';
 
 class HistoryScreen extends StatelessWidget {
   final String username; // Tambahkan parameter username
+  final String userToken;
 
-  const HistoryScreen({required this.username, Key? key}) : super(key: key);
+  const HistoryScreen({required this.username, Key? key, required this.userToken}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,7 @@ class HistoryScreen extends StatelessWidget {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => HomeScreen(username: username),
+                builder: (context) => HomeScreen(username: username, userToken: userToken),
               ),
             );
           },
@@ -57,30 +58,30 @@ class HistoryScreen extends StatelessWidget {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => HomeScreen(username: username),
+                builder: (context) => HomeScreen(username: username, userToken: userToken),
               ),
             );
           } else if (index == 1) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => HistoryScreen(username: username),
+                builder: (context) => HistoryScreen(username: username, userToken: userToken),
               ),
             );
           } else if (index == 2) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => FAQScreen(username: username),
+                builder: (context) => FAQScreen(username: username, userToken: userToken),
               ),
             );
           } else if (index == 3) {
-            // Navigator.pushReplacement(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) => ProfileScreen(username: username),
-            //   ),
-            // );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileScreen(username: username, userToken: userToken),
+              ),
+            );
           }
         },
         items: const [

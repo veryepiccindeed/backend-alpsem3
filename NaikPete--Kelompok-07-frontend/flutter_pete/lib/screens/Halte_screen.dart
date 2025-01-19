@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pete/screens/maphalte.dart';
+import 'package:flutter_pete/screens/map_halte.dart';
 import 'package:latlong2/latlong.dart';
 
 class HalteListScreen extends StatelessWidget {

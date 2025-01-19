@@ -1,89 +1,193 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_pete/network/api.dart'; // Sesuaikan dengan path yang benar
+import 'package:flutter_pete/screens/History.dart';
+import 'package:flutter_pete/screens/faq_screen.dart';
+import 'package:flutter_pete/screens/login_screen.dart';
+import 'home_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
-  final String username; // Username yang diterima
-  final String email;    // Email yang diterima
+class ProfileScreen extends StatefulWidget {
+  final String username;
+  final String userToken; // Tambahkan parameter userToken
 
-  const ProfileScreen({Key? key, required this.username, required this.email}) : super(key: key);
+  const ProfileScreen({Key? key, required this.username, required this.userToken}) : super(key: key);
+
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final Network _network = Network();
+  Map<String, dynamic>? _userProfile;
+  bool _isLoading = true;
+  String _errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProfile();
+  }
+
+  Future<void> _fetchProfile() async {
+    try {
+      final response = await _network.getData('/profile'); // Endpoint profil
+      print('Profile Response: ${response.body}'); // Log respons profil
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          _userProfile = data;
+          _isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load profile');
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context), // Kembali ke halaman sebelumnya
-        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Avatar dan Nama User
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: Colors.grey[300],
-                  child: const Icon(Icons.person, size: 40, color: Colors.white),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _errorMessage.isNotEmpty
+              ? Center(child: Text('Error: $_errorMessage'))
+              : Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          // Foto Profil
+                          CircleAvatar(
+                            radius: 50,
+                            backgroundImage: _userProfile?['user']['foto_profil'] != null
+                                ? NetworkImage(_userProfile!['user']['foto_profil']) // Tampilkan foto profil dari URL
+                                : null, // Jika foto profil null, backgroundImage akan null
+                            child: _userProfile?['user']['foto_profil'] == null
+                                ? const Icon(Icons.person, size: 50) // Ikon default jika foto profil tidak ada
+                                : null,
+                          ),
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${_userProfile?['user']['nama']}',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              Text(
+                                '${_userProfile?['user']['email']}',
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      ListTile(
+                        leading: const Icon(Icons.account_circle_outlined),
+                        title: const Text('Profile saya'),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        onTap: () {
+                          print('Profile saya ditekan');
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.history),
+                        title: const Text('Riwayat'),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HistoryScreen(username: widget.username, userToken: widget.userToken),
+                            ),
+                          );
+                          print('Riwayat ditekan');
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.help_outline),
+                        title: const Text('FAQ'),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FAQScreen(username: widget.username, userToken: widget.userToken),
+                            ),
+                          );
+                          print('FAQ ditekan');
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.logout),
+                        title: const Text('Keluar'),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => LoginScreen()),
+                          );
+                          print('Keluar ditekan');
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(width: 15),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      username,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      email,
-                      style: const TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 30),
-
-            // Menu List
-            ListTile(
-              leading: const Icon(Icons.person_outline),
-              title: const Text('Profile saya'),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: const Icon(Icons.history),
-              title: const Text('Riwayat'),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: const Icon(Icons.help_outline),
-              title: const Text('FAQ'),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text('Keluar'),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {
-                // Logout action
-                Navigator.popUntil(context, (route) => route.isFirst);
-              },
-            ),
-          ],
-        ),
-      ),
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Colors.cyan,
         unselectedItemColor: Colors.grey,
-        currentIndex: 3, // Profil Index
+        showUnselectedLabels: true,
+        currentIndex: 3,
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeScreen(username: widget.username, userToken: widget.userToken),
+              ),
+            );
+          } else if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HistoryScreen(username: widget.username, userToken: widget.userToken),
+              ),
+            );
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FAQScreen(username: widget.username, userToken: widget.userToken),
+              ),
+            );
+          } else if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileScreen(username: widget.username, userToken: widget.userToken),
+              ),
+            );
+          }
+        },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),

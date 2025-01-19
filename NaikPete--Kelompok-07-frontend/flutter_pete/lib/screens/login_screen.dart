@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_pete/screens/forgotpassword.dart';
-import 'package:flutter_pete/screens/register_screen.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_pete/screens/home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'home_screen.dart'; // Sesuaikan dengan path yang benar
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -13,87 +12,94 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // Controllers for user input
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   String? selectedRole = 'customer'; // Default role
   bool isLoading = false;
 
-  // Function to log in the user
-
   Future<void> login() async {
-  final email = emailController.text.trim();
-  final password = passwordController.text.trim();
-  
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
-  // Validate input fields
-  if (email.isEmpty || password.isEmpty || selectedRole == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('All fields are required!'),
-        backgroundColor: Colors.red,
-      ),
-    );
-    return;
-  }
-
-  setState(() {
-    isLoading = true;
-  });
-
-  try {
-    // API endpoint
-    const url = 'http://127.0.0.1:8000/api/login';
-
-    // Make POST request
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-        'role': selectedRole,
-      }),
-    );
-
-    // Process API response
-    final data = jsonDecode(response.body);
-    final token = data['token'];
-    final user = data['user'];
-
-    if (token != null && user != null) {
-      // Mengambil nama pengguna jika ada, atau fallback ke 'Guest'
-      final String userName = user['name'];
-
-      // Pindah ke halaman utama (HomeScreen) dengan nama pengguna
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomeScreen(username: userName), // Pass nama pengguna ke halaman utama
+    // Validasi input
+    if (email.isEmpty || password.isEmpty || selectedRole == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('All fields are required!'),
+          backgroundColor: Colors.red,
         ),
       );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login failed, try again.')),
-      );
+      return;
     }
 
-  } catch (error) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('An error occurred. Please check your connection.'),
-        backgroundColor: Colors.red,
-      ),
-    );
-  } finally {
     setState(() {
-      isLoading = false;
+      isLoading = true;
     });
-  }
-}
 
+    try {
+      // API endpoint
+      const url = 'http://127.0.0.1:8000/api/login';
+
+      // Make POST request
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+          'role': selectedRole,
+        }),
+      );
+
+      print('Raw Response: ${response.body}'); // Log respons mentah
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final token = data['token'];
+        final user = data['user'];
+
+        if (token != null && user != null) {
+          // Simpan token ke SharedPreferences
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', token);
+
+          // Navigasi ke halaman utama (HomeScreen) dengan nama pengguna
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomeScreen(username: user['name'] ?? 'Guest', userToken: token),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login failed, try again.')),
+          );
+        }
+      } else {
+        // Handle error response from API
+        final errorData = jsonDecode(response.body);
+        final errorMessage = errorData['message'] ?? 'Login failed, try again.';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage)),
+        );
+      }
+    } catch (error) {
+      // Handle network or other errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('An error occurred. Please check your connection.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -168,30 +174,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
-                          const SizedBox(height: 10),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
-                );
-              },
-              child: const Text('Forgot Password?', style: TextStyle(color: Colors.cyan)),
-            ),
-            const SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
-                // Pindah ke halaman registrasi
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  RegisterScreen()),
-                );
-              },
-              child: const Text(
-                'Register',
-                style: TextStyle(color: Colors.cyan),
-              ),
-            ),
             ],
           ),
         ),

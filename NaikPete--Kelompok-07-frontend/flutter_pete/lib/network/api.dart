@@ -7,14 +7,21 @@ class Network {
   String? token;
 
   Future<void> _getToken() async {
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
-    var savedToken = localStorage.getString('token');
-    if (savedToken != null) {
-      token = jsonDecode(savedToken)['token'];
-    }
+    final prefs = await SharedPreferences.getInstance();
+    token = prefs.getString('token');
   }
 
-  Future<http.Response> auth(Map<String, dynamic> data, String apiURL) async {
+  Future<http.Response> getData(String apiURL) async {
+    await _getToken(); // Ambil token sebelum melakukan permintaan
+    var fullUrl = Uri.parse('$_url$apiURL');
+    return await http.get(
+      fullUrl,
+      headers: _setHeaders(),
+    );
+  }
+
+  Future<http.Response> postData(String apiURL, Map<String, dynamic> data) async {
+    await _getToken(); // Ambil token sebelum melakukan permintaan
     var fullUrl = Uri.parse('$_url$apiURL');
     return await http.post(
       fullUrl,
@@ -23,18 +30,9 @@ class Network {
     );
   }
 
-  Future<http.Response> getData(String apiURL) async {
-    var fullUrl = Uri.parse('$_url$apiURL');
-    await _getToken();
-    return await http.get(
-      fullUrl,
-      headers: _setHeaders(),
-    );
-  }
-
   Map<String, String> _setHeaders() => {
         'Content-type': 'application/json',
         'Accept': 'application/json',
-        if (token != null) 'Authorization': 'Bearer $token',
+        if (token != null) 'Authorization': 'Bearer $token', // Tambahkan token jika ada
       };
 }
