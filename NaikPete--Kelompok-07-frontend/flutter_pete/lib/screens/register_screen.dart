@@ -2,12 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart'; // Untuk kIsWeb
-import 'package:file_picker/file_picker.dart'; // Untuk Flutter Web
-import 'package:http/http.dart';
-import 'package:image_picker/image_picker.dart'; // Untuk Android/iOS
-import 'package:flutter_pete/screens/login_screen.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart'; // For kIsWeb
+import 'package:file_picker/file_picker.dart'; // For Flutter Web
+import 'package:http/http.dart' as http; // For HTTP requests
+import 'package:image_picker/image_picker.dart'; // For Android/iOS
+import 'package:flutter_pete/screens/login_screen.dart'; // Adjust import as needed
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -17,86 +16,86 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  // Controllers untuk input data
-  final TextEditingController NameController = TextEditingController();
+  // Controllers for input fields
+  final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController birthDateController = TextEditingController();
 
-  // Variabel untuk menyimpan pilihan peran, gender, dan validasi
+  // Variables for dropdowns
   String? selectedRole;
   String? selectedGender;
 
-  // Foto profil
-  Uint8List? webImage; // Untuk Flutter Web
-  File? profileImage; // Untuk Android/iOS
+  // Variables for profile image
+  Uint8List? webImage; // For Flutter Web
+  File? profileImage; // For Android/iOS
 
-  // Fungsi untuk validasi input
+  // Function to validate the form
   bool validateForm() {
-  if (NameController.text.isEmpty) {
-    showError("Nama wajib diisi");
-    return false;
+    if (nameController.text.isEmpty) {
+      showError("Nama wajib diisi");
+      return false;
+    }
+    if (emailController.text.isEmpty || !emailController.text.contains('@')) {
+      showError("Masukkan email yang valid");
+      return false;
+    }
+    if (phoneController.text.isEmpty || !isNumeric(phoneController.text)) {
+      showError("Nomor telepon hanya boleh berisi angka");
+      return false;
+    }
+    if (birthDateController.text.isEmpty) {
+      showError("Tanggal lahir wajib diisi");
+      return false;
+    }
+    if (selectedGender == null) {
+      showError("Pilih jenis kelamin");
+      return false;
+    }
+    if (cityController.text.isEmpty) {
+      showError("Alamat wajib diisi");
+      return false;
+    }
+    if (passwordController.text.isEmpty || passwordController.text.length < 6) {
+      showError("Password harus minimal 6 karakter");
+      return false;
+    }
+    if (selectedRole == null) {
+      showError("Silakan pilih peran Anda");
+      return false;
+    }
+    return true;
   }
-  if (emailController.text.isEmpty || !emailController.text.contains('@')) {
-    showError("Masukkan email yang valid");
-    return false;
-  }
-  if (phoneController.text.isEmpty || !isNumeric(phoneController.text)) {
-    showError("Nomor telepon hanya boleh berisi angka");
-    return false;
-  }
-  if (birthDateController.text.isEmpty) {
-    showError("Tanggal lahir wajib diisi");
-    return false;
-  }
-  if (selectedGender == null) {
-    showError("Pilih jenis kelamin");
-    return false;
-  }
-  if (cityController.text.isEmpty) {
-    showError("Alamat wajib diisi");
-    return false;
-  }
-  if (passwordController.text.isEmpty || passwordController.text.length < 6) {
-    showError("Password harus minimal 6 karakter");
-    return false;
-  }
-  if (selectedRole == null) {
-    showError("Silakan pilih peran Anda");
-    return false;
-  }
-  return true;
-}
 
-  // Fungsi untuk mengecek apakah input hanya angka
+  // Function to check if a string is numeric
   bool isNumeric(String value) {
     return RegExp(r'^[0-9]+$').hasMatch(value);
   }
 
-  // Fungsi untuk menampilkan pesan error
+  // Function to show error messages
   void showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
     );
   }
 
-  // Fungsi untuk memilih foto profil
+  // Function to pick an image
   Future<void> pickImage() async {
     if (kIsWeb) {
-      // Gunakan file_picker untuk Flutter Web
+      // For Flutter Web
       final result = await FilePicker.platform.pickFiles(
         type: FileType.image,
         allowMultiple: false,
       );
       if (result != null) {
         setState(() {
-          webImage = result.files.first.bytes; // Data gambar dalam bentuk Uint8List
+          webImage = result.files.first.bytes;
         });
       }
     } else {
-      // Gunakan image_picker untuk Android/iOS
+      // For Android/iOS
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
@@ -107,13 +106,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  // Fungsi untuk memilih tanggal lahir
+  // Function to select birth date
   Future<void> selectBirthDate() async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(1900), // Tanggal minimal
-      lastDate: DateTime.now(), // Tanggal maksimal adalah hari ini
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
     );
 
     if (pickedDate != null) {
@@ -121,6 +120,68 @@ class _RegisterScreenState extends State<RegisterScreen> {
         birthDateController.text =
             "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
       });
+    }
+  }
+
+  // Function to register the user
+  Future<void> registerUser() async {
+    if (!validateForm()) {
+      return; // Stop if validation fails
+    }
+
+    // Prepare the request body
+    Map<String, dynamic> requestBody = {
+      'nama': nameController.text,
+      'email': emailController.text,
+      'password': passwordController.text,
+      'no_hp': phoneController.text,
+      'alamat': cityController.text,
+      'gender': selectedGender,
+      'tgl_lahir': birthDateController.text,
+      'role': selectedRole,
+    };
+
+    // Convert image to base64 if available
+    if (kIsWeb && webImage != null) {
+      requestBody['foto_profil'] = base64Encode(webImage!);
+    } else if (!kIsWeb && profileImage != null) {
+      List<int> imageBytes = await profileImage!.readAsBytes();
+      requestBody['foto_profil'] = base64Encode(imageBytes);
+    }
+
+    // Make the HTTP POST request
+    try {
+      final response = await http.post(
+        Uri.parse('http://127.0.0.1:8000/api/register'), // Replace with your backend URL
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      // Handle the response
+      if (response.statusCode == 201) {
+        // Registration successful
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registration successful!')),
+        );
+        // Navigate to the login screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      } else {
+        // Handle errors
+        final responseData = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${responseData['message']}')),
+        );
+      }
+    } catch (e) {
+      // Handle network or other errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
     }
   }
 
@@ -133,7 +194,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context); // Kembali ke halaman sebelumnya
+            Navigator.pop(context);
           },
         ),
         title: const Text(
@@ -154,15 +215,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Foto Profil
+            // Profile Picture
             GestureDetector(
               onTap: pickImage,
               child: Center(
                 child: CircleAvatar(
                   radius: 50,
                   backgroundImage: kIsWeb
-                      ? (webImage != null ? MemoryImage(webImage!) : null) // Web
-                      : (profileImage != null ? FileImage(profileImage!) : null), // Mobile
+                      ? (webImage != null ? MemoryImage(webImage!) : null)
+                      : (profileImage != null ? FileImage(profileImage!) : null),
                   child: (webImage == null && profileImage == null)
                       ? const Icon(Icons.camera_alt, size: 50, color: Colors.grey)
                       : null,
@@ -171,17 +232,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Input Nama Depan
+            // Name Field
             TextField(
-              controller: NameController,
+              controller: nameController,
               decoration: const InputDecoration(
-                labelText: 'Nama depan',
+                labelText: 'Nama',
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 15),
 
-            // Input Email
+            // Email Field
             TextField(
               controller: emailController,
               decoration: const InputDecoration(
@@ -192,7 +253,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 15),
 
-            // Input Nomor Telepon
+            // Phone Field
             TextField(
               controller: phoneController,
               keyboardType: TextInputType.number,
@@ -204,7 +265,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 15),
 
-            // Input Tanggal Lahir
+            // Birth Date Field
             TextField(
               controller: birthDateController,
               readOnly: true,
@@ -217,7 +278,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 15),
 
-            // Dropdown untuk memilih jenis kelamin
+            // Gender Dropdown
             DropdownButtonFormField<String>(
               value: selectedGender,
               decoration: const InputDecoration(
@@ -236,7 +297,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 15),
 
-            // Input Kota
+            // City Field
             TextField(
               controller: cityController,
               decoration: const InputDecoration(
@@ -246,7 +307,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 15),
 
-            // Input Password
+            // Password Field
             TextField(
               controller: passwordController,
               obscureText: true,
@@ -258,7 +319,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 15),
 
-            // Dropdown untuk memilih peran
+            // Role Dropdown
             DropdownButtonFormField<String>(
               value: selectedRole,
               decoration: const InputDecoration(
@@ -277,16 +338,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Tombol Selanjutnya
+            // Register Button
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.cyan,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
               ),
-              onPressed: () {
-                
-              },
+              onPressed: registerUser,
               child: const Text(
                 'Selanjutnya',
                 style: TextStyle(color: Colors.white),
