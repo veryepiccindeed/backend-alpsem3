@@ -24,11 +24,20 @@ class Trayek extends Model
     {
         return $this->hasMany(TrayekHalte::class, 'id_trayek');
     }
-
-        // Pada model Trayek
+    
     public function haltes()
     {
         return $this->hasMany(Halte::class, 'kode_trayek', 'kode_trayek');
+    }
+
+    public function kendaraan()
+    {
+        return $this->hasMany(Kendaraan::class, 'trayek_id');
+    }
+
+    public function transaksi()
+    {
+        return $this->hasMany(Transaction::class, 'id_trayek');
     }
 
 }

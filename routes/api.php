@@ -32,7 +32,7 @@ Route::post('/login', [LoginController::class, 'login']);
 // Middleware 
 Route::middleware('auth:sanctum')->group(function () {
     // Route untuk pemesanan tiket, memerlukan autentikasi
-    Route::post('/pemesanan', [PemesananController::class, 'pemesananTiket']);
+    Route::post('/pesan-tiket', [PemesananController::class, 'pesanTiket']);
     // Logout
     Route::post('/logout', [ApiController::class, 'logout']);
     // Tes Profile Yang Ter-login
@@ -41,6 +41,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/edit-profile', [ApiController::class, 'editProfile']);
     // Delete account
     Route::delete('/delete-account', [ApiController::class, 'deleteUser']);
+
+    // Filter tgl transaksi
+    Route::get('/transaksi/filter/date/{date}', [TransaksiController::class, 'filterByDate']);
+    Route::get('/transaksi/filter/month/{month}/year/{year}', [TransaksiController::class, 'filterByMonth']);
+    Route::get('/transaksi/filter/year/{year}', [TransaksiController::class, 'filterByYear']);
+    Route::get('/transaksi/filter/date/{date}/month/{month}/year/{year}', [TransaksiController::class, 'filterByDateMonthYear']);
+    Route::get('/transaksi/sort/{column}/{direction?}', [TransaksiController::class, 'sortTransactions']);
+
 });
 
 // Yang bisa dilihat tanpa autentikasi

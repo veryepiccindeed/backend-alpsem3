@@ -10,6 +10,7 @@ class Kendaraan extends Model
     use HasFactory;
 
     protected $fillable = [
+        'trayek_id',
         'no_plat',
         'tahun_kendaraan',
         'is_tersedia',
@@ -29,5 +30,10 @@ class Kendaraan extends Model
     public function kursis()
     {
         return $this->hasMany(Kursi::class, 'id_kendaraan');
+    }
+
+    public function trayek()
+    {
+        return $this->belongsTo(Trayek::class, 'trayek_id');
     }
 }

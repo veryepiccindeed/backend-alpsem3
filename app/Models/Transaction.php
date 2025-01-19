@@ -12,13 +12,16 @@ class Transaction extends Model
     protected $fillable = [
         'id_user',
         'id_driver',
+        'id_trayek',
         'jenis_tiket',
         'tgl_transaksi',
-        'jumlah_penumpang',
+        'jumlah_tiket',
         'payment_method',
         'payment_amount',
         'payment_status',
     ];
+
+    public $timestamps = false;
 
     public function user()
     {
@@ -29,4 +32,10 @@ class Transaction extends Model
     {
         return $this->belongsTo(Driver::class, 'id_driver');
     }
+
+    public function trayek()
+    {
+        return $this->belongsTo(Trayek::class, 'id_trayek');
+    }
+
 }
