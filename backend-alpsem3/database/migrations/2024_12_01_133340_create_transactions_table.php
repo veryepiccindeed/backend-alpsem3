@@ -8,7 +8,7 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-   */
+     */
     public function up(): void
     {
         if (!Schema::hasTable('transactions')) {
@@ -34,5 +34,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('transactions');
     }
-
 };

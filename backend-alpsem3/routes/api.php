@@ -50,8 +50,18 @@ Route::get("send-event", function(){
     broadcast(new \App\Events\HelloEvent());
 });
 
+Route::get('/', function() {
+    return response()->json([
+        'message' => 'Welcome API'
+    ]);
+});
 
 
 Route::get('notifications/{id}', [NotificationController::class, 'show']);
 use Illuminate\Support\Facades\Broadcast;
 
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    // Mengambil semua data pengguna yang terautentikasi
+    $users = \App\Models\User::all();
+    return response()->json($users);
+});

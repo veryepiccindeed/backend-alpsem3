@@ -25,4 +25,9 @@ class Kendaraan extends Model
     {
         return $this->hasMany(Driver::class, 'id_kendaraan');
     }
+
+    public function kursis()
+    {
+        return $this->hasMany(Kursi::class, 'id_kendaraan');
+    }
 }

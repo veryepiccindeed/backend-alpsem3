@@ -53,17 +53,6 @@ class DatabaseSeeder extends Seeder
                 'tgl_lahir' => '1990-01-02',
                 'role' => 'driver',
                 'foto_profil' => null,
-            ],
-            [
-                'nama' => 'John Doe ',
-                'email' => 'john.doe2@example.com',
-                'password' => 'inipassword2', 
-                'no_hp' => '081234567899',
-                'alamat' => 'Jl. Contoh No. 2',
-                'gender' => 'laki-laki',
-                'tgl_lahir' => '1990-01-02',
-                'role' => 'driver',
-                'foto_profil' => null,
             ]
         ]);
 

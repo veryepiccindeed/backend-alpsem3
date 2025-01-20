@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\ApiController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -22,4 +23,8 @@ Route::middleware('auth:web')->get('/profile', function (Request $request) {
 
 Route::get("send-event", function(){
     broadcast(new \App\Events\HelloEvent());
+});
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
 });
