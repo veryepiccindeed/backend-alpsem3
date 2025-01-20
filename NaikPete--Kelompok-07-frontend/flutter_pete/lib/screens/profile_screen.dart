@@ -1,14 +1,16 @@
-import 'dart:convert';
+import 'dart:convert'; // Import package untuk base64Decode
+import 'dart:typed_data'; // Import Uint8List
 import 'package:flutter/material.dart';
 import 'package:flutter_pete/network/api.dart'; // Sesuaikan dengan path yang benar
 import 'package:flutter_pete/screens/History.dart';
+import 'package:flutter_pete/screens/edit_profile.dart';
 import 'package:flutter_pete/screens/faq_screen.dart';
 import 'package:flutter_pete/screens/login_screen.dart';
 import 'home_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String username;
-  final String userToken; // Tambahkan parameter userToken
+  final String userToken;
 
   const ProfileScreen({Key? key, required this.username, required this.userToken}) : super(key: key);
 
@@ -71,7 +73,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           CircleAvatar(
                             radius: 50,
                             backgroundImage: _userProfile?['user']['foto_profil'] != null
-                                ? NetworkImage(_userProfile!['user']['foto_profil']) // Tampilkan foto profil dari URL
+                                ? _buildImageFromBase64(_userProfile!['user']['foto_profil']) // Tampilkan foto profil dari Base64
                                 : null, // Jika foto profil null, backgroundImage akan null
                             child: _userProfile?['user']['foto_profil'] == null
                                 ? const Icon(Icons.person, size: 50) // Ikon default jika foto profil tidak ada
@@ -106,6 +108,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         title: const Text('Profile saya'),
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                         onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditProfileScreen(
+                                userProfile: _userProfile!,
+                                userToken: widget.userToken,
+                              ),
+                            ),
+                          ).then((isUpdated) {
+                            if (isUpdated == true) {
+                              _fetchProfile(); // Perbarui data profil setelah edit
+                            }
+                          });
                           print('Profile saya ditekan');
                         },
                       ),
@@ -196,5 +211,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
+  }
+
+  // Fungsi untuk mengonversi Base64 ke Image
+  ImageProvider _buildImageFromBase64(String base64String) {
+    final Uint8List bytes = base64Decode(base64String);
+    return MemoryImage(bytes);
   }
 }

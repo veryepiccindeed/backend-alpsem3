@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_pete/screens/register_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home_screen.dart'; // Sesuaikan dengan path yang benar
@@ -174,6 +175,27 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
+                                      const SizedBox(height: 10),
+                  GestureDetector(
+                    onTap: () {
+                      // TODO: Tambahkan navigasi ke halaman lupa password
+                    },
+                    child: const Text('Lupa kata sandi?', style: TextStyle(color: Colors.cyan)),
+                  ),
+                  const SizedBox(height: 20),
+                  GestureDetector(
+                    onTap: () {
+                      // Arahkan ke halaman register_screen.dart
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                      );
+                    },
+                    child: const Text(
+                      'Belum memiliki akun? Daftar',
+                      style: TextStyle(color: Colors.cyan),
+                    ),
+                  ),
             ],
           ),
         ),
